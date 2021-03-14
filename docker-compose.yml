@@ -1,0 +1,32 @@
+version: '2.1'
+services:
+  mysql:
+    image: mysql
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 
+      MYSQL_DATABASE: classicmodels
+      MYSQL_USER: manager
+      MYSQL_PASSWORD: 
+    volumes:
+      - /srv/docker/hslu-dbs/mysql:/var/lib/mysql
+    ports:
+      - 8080:3306
+  proxy:
+    image: linuxserver/swag
+    container_name: proxy
+    restart: always
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Zurich
+      - URL=enterpriselab.ch
+      - SUBDOMAINS=dbs-f21-mpreuss
+      - VALIDATION=http
+      - ONLY_SUBDOMAINS=true
+    volumes:
+      - /srv/docker/hslu-dbs/proxy:/config
+    ports:
+      - 443:443
+      - 80:80
