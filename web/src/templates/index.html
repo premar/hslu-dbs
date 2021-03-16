@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>{{ title }}</title>
+  <script src='../static/Chart.min.js'></script>
+</head>
+<body>
+  <center>
+    <h1>{{ title }}</h1>
+    <canvas id="exampleChart" width="1000px" height="400px"></canvas>
+  </center>
+</body>
+<script>
+  Chart.defaults.global.legend.display = false;
+
+var chartData = {
+  labels : [{% for item in labels %}
+             "{{item}}",
+            {% endfor %}],
+  datasets : [{
+      fill: true,
+      lineTension: 0.1,
+      backgroundColor: "rgba(75,192,192,0.4)",
+      borderColor: "rgba(75,192,192,1)",
+      borderCapStyle: 'butt',
+      borderDash: [],
+      borderDashOffset: 0.0,
+      borderJoinStyle: 'miter',
+      pointBorderColor: "rgba(75,192,192,1)",
+      pointBackgroundColor: "#fff",
+      pointBorderWidth: 1,
+      pointHoverRadius: 5,
+      pointHoverBackgroundColor: "rgba(75,192,192,1)",
+      pointHoverBorderColor: "rgba(220,220,220,1)",
+      pointHoverBorderWidth: 2,
+      pointRadius: 1,
+      pointHitRadius: 10,
+      data : [{% for item in values %}
+                {{item}},
+              {% endfor %}],
+      spanGaps: false
+  }]
+}
+
+var ctx = document.getElementById("exampleChart").getContext("2d");
+
+var exampleChart = new Chart(ctx, {
+  type: 'bar',
+  data: chartData,
+});
+</script>
+</html>
