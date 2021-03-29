@@ -24,7 +24,7 @@ from orders
     left join products on products.productCode = orderdetails.productCode
 WHERE orders.orderDate BETWEEN %s AND %s
 GROUP BY products.productCode
-ORDER BY %s DESC
+ORDER BY {table} DESC
 """
 
 
@@ -67,7 +67,7 @@ def receive_data(start_date, end_date, index):
         port=application.config["PORT"])
 
     with connection.cursor() as cursor:
-        cursor.execute(QUERY, (start_date, end_date, index))
+        cursor.execute(QUERY.format(table=index), (start_date, end_date))
         result = cursor.fetchall()
         for row in result:
             product.append(row[0])
