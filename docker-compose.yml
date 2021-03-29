@@ -30,3 +30,11 @@ services:
     ports:
       - 443:443
       - 80:80
+
+  web:
+    container_name: web
+    image: web
+    restart: always
+    build: ./web
+    links:
+     - mysql
