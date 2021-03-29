@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>{{ title }}</title>
-  <script src='../static/Chart.min.js'></script>
+  <script src='/static/Chart.min.js'></script>
 </head>
 <body>
   <center>
@@ -15,11 +15,15 @@
   Chart.defaults.global.legend.display = false;
 
 var chartData = {
-  labels : [{% for item in label_main %}
+  labels : [{% for item in label %}
              "{{item}}",
             {% endfor %}],
-  datasets : [{% for item in values %} {
-    data: {{item}}
+  datasets :
+      [{% for item in values %} {
+          data: {{item[2]}},
+          label: "{{item[0]}}",
+          backgroundColor: "{{item[1]}}",
+          hoverBackgroundColor: "{{item[1]}}"
   },{% endfor %}]
 }
 
@@ -29,7 +33,13 @@ var exampleChart = new Chart(ctx, {
     type: 'horizontalBar',
     data: chartData,
     options: {
-        responsive: true
+        responsive: true,
+        legend: {
+            display: true,
+            labels: {
+                fontColor: 'black'
+            }
+        }
     }
 });
 </script>
