@@ -9,7 +9,7 @@ application.config.from_pyfile('config.py')
 DEFAULT_START_DATE = '2003-01-01'
 DEFAULT_END_DATE = '2005-12-31'
 DEFAULT_INDEX = 'TotalProfit'
-VALID_INDEX = ("Product", "Quantity", "Cost", "AvgSellPrice", "PossibleProfit", "TotalProfit")
+VALID_INDEX = ("Product", "Quantity", "currentStorageQuantity", "Cost", "AvgSellPrice", "AvgProfit", "PossibleProfit", "ProfitDifference", "TotalProfit")
 
 QUERY = """
 SELECT p.productName as Product,
