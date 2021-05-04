@@ -8,10 +8,56 @@
 <body>
   <center>
     <h1>{{ title }}</h1>
+
+    <p>Page will load with selected conditions after clicking "Get Data" if they are valid!</p>
+
+    <label for="start">Start date:</label>
+    <input type="date" id="start"
+      value="2003-01-01" 
+      min="2003-01-01" 
+      max="2005-12-31">
+
+    <label for="end">End date:</label>
+    <input type="date" id="end" 
+      value="2005-12-31"
+      min="2003-01-01" 
+      max="2005-12-31">
+
+    <label for="order">Order by:</label>
+
+    <select name="order" id="orderby">
+      <option value="Product">Product</option>
+      <option value="Quantity">Quantity sold</option>
+      <option value="Cost">Buy price</option>
+      <option value="AvgSellPrice">Average sell price</option>
+      <option value="TotalProfit">Total profit</option>
+      <option value="PossibleProfit">Possible profit</option>
+    </select>
+
+    <button id="reload" onclick="changeQuery()">Get Data</button>
+
+    <p id="error"></p>
+    <p></p>
+
     <canvas id="exampleChart" width="2000px" height="10000px"></canvas>
   </center>
 </body>
 <script>
+  function changeQuery(){
+    var order = document.getElementById("orderby").value;
+    var start = document.getElementById("start").value;
+    var end = document.getElementById("end").value;
+    
+    var startValid = start >= "2003-01-01" && start <= "2005-12-31";
+    var endValid = end >= "2003-01-01" && end <= "2005-12-31";
+
+    if (start < end && startValid && endValid) {
+      window.location.href = "/"+start+"/"+end+"/" + order;
+    } else {
+      document.getElementById("error").innerText = "Error in selected condition!";
+    }
+  }
+
   Chart.defaults.global.legend.display = false;
 
 var chartData = {
@@ -42,5 +88,6 @@ var exampleChart = new Chart(ctx, {
         }
     }
 });
+
 </script>
 </html>
