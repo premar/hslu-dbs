@@ -8,22 +8,29 @@ application.config.from_pyfile('config.py')
 
 DEFAULT_START_DATE = '2003-01-01'
 DEFAULT_END_DATE = '2005-12-31'
-DEFAULT_INDEX = 'Profit'
-VALID_INDEX = ("Quantity", "Cost", "Sell", "Retail", "Profit")
+DEFAULT_INDEX = 'TotalProfit'
+VALID_INDEX = ("Product", "Quantity", "Cost", "AvgSellPrice", "PossibleProfit", "TotalProfit")
 
 QUERY = """
-SELECT products.productName AS Product,
-       SUM(orderdetails.quantityOrdered) as Quantity,
-       SUM((orderdetails.quantityOrdered * products.buyPrice)) as Cost,
-       SUM((orderdetails.quantityOrdered * orderdetails.priceEach)) as Sell,
-       SUM((orderdetails.quantityOrdered * products.MSRP)) as Retail,
-       SUM((orderdetails.quantityOrdered * orderdetails.priceEach) - 
-       (orderdetails.quantityOrdered * products.buyPrice)) AS Profit
-from orders
-    left join orderdetails on orders.orderNumber = orderdetails.orderNumber
-    left join products on products.productCode = orderdetails.productCode
-WHERE orders.orderDate BETWEEN %s AND %s
-GROUP BY products.productCode
+SELECT p.productName as Product,
+       p.buyPrice as Cost,
+	   p.MSRP as MSRP,
+       p.quantityInStock as currentStorageQuantity,
+       AVG(od.priceEach) as AvgSellPrice,
+       AVG(od.priceEach - p.buyPrice) AS AvgProfit,
+       SUM(od.quantityOrdered) as Quantity,
+       SUM((od.quantityOrdered * od.priceEach) - (od.quantityOrdered * p.buyPrice)) AS TotalProfit,
+       SUM((od.quantityOrdered * p.MSRP) - (od.quantityOrdered * p.buyPrice)) AS PossibleProfit,
+       SUM(
+		(od.quantityOrdered * p.MSRP) - (od.quantityOrdered * p.buyPrice) - (
+			(od.quantityOrdered * od.priceEach) - (od.quantityOrdered * p.buyPrice)
+		)
+       ) AS ProfitDifference
+from orders o
+    left join orderdetails od on o.orderNumber = od.orderNumber
+    left join products p on p.productCode = od.productCode
+WHERE o.orderDate BETWEEN %s AND %s
+GROUP BY p.productCode
 ORDER BY {table} DESC
 """
 
@@ -53,11 +60,16 @@ def custom(start, end, index):
 
 def receive_data(start_date, end_date, index):
     product = []
-    quantity = []
     cost = []
-    sell = []
-    retail = []
-    profit = []
+    msrp = []
+    storage_quantity = []
+    avg_sell_price = []
+    avg_profit = []
+    quantity = []
+    actual_profit = []
+    possible_profit = []
+    profit_differnece = []
+    
 
     connection = mysql.connector.connect(
         user=application.config["USER"],
@@ -71,19 +83,26 @@ def receive_data(start_date, end_date, index):
         result = cursor.fetchall()
         for row in result:
             product.append(row[0])
-            quantity.append(math.trunc(row[1]))
-            cost.append(math.trunc(row[2]))
-            sell.append(math.trunc(row[3]))
-            retail.append(math.trunc(row[4]))
-            profit.append(math.trunc(row[5]))
+            cost.append(math.trunc(row[1]))
+            msrp.append(math.trunc(row[2]))
+            storage_quantity.append(math.trunc(row[3]))
+            avg_sell_price.append(math.trunc(row[4]))
+            avg_profit.append(math.trunc(row[5]))
+            quantity.append(math.trunc(row[6]))
+            actual_profit.append(math.trunc(row[7]))
+            possible_profit.append(math.trunc(row[8]))
+            profit_differnece.append(math.trunc(row[9]))
 
     data = (
-        ("Profit in [$]", "#003f5c", profit),
-        ("Cost in [$]", "#58508d", cost),
-        ("Sell in  [$]", "#bc5090", sell),
-        ("Retail in  [$]", "#ff6361", retail),
-        ("Quantity as [Qty]", "#ffa600", quantity),
-
+        ("Buy price in [$]", "#EB0800", cost),
+        ("MSRP in [$]", "#14FFC1", msrp),
+        ("Quantity in storage as [Qty]", "#E87935", storage_quantity),
+        ("Average sell price in [$]", "#3886F2", avg_sell_price),
+        ("Average profit in [$]", "#588C50", avg_profit),
+        ("Quantity sold as [Qty]", "#ffa600", quantity),
+        ("Total profit in [$]", "#58508d", actual_profit),
+        ("Possible profit in [$]", "#bc5090", possible_profit),
+        ("Difference of possible to actual profit in [$]", "#ff6361", profit_differnece),
     )
     return data, product
 
