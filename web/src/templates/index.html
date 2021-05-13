@@ -19,9 +19,9 @@
 
     <label for="end">End date:</label>
     <input type="date" id="end" 
-      value="2005-12-31"
+      value="2005-05-31"
       min="2003-01-01" 
-      max="2005-12-31">
+      max="2005-05-31">
 
     <label for="order">Order by:</label>
 
@@ -51,8 +51,8 @@
     var start = document.getElementById("start").value;
     var end = document.getElementById("end").value;
     
-    var startValid = start >= "2003-01-01" && start <= "2005-12-31";
-    var endValid = end >= "2003-01-01" && end <= "2005-12-31";
+    var startValid = start >= "2003-01-01" && start <= "2005-05-31";
+    var endValid = end >= "2003-01-01" && end <= "2005-05-31";
 
     if (start < end && startValid && endValid) {
       window.location.href = "/"+start+"/"+end+"/" + order;

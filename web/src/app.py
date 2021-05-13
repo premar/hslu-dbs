@@ -81,6 +81,7 @@ def receive_data(start_date, end_date, index):
     with connection.cursor() as cursor:
         cursor.execute(QUERY.format(table=index), (start_date, end_date))
         result = cursor.fetchall()
+        print(len(result))
         for row in result:
             product.append(row[0])
             cost.append(math.trunc(row[1]))
